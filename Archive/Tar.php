@@ -1774,6 +1774,9 @@ class Archive_Tar extends PEAR
         if (strpos($file, '../') !== false || strpos($file, '..\\') !== false) {
             return true;
         }
+        if (isset($file[0]) && $file[0] === '/') {
+            return true;
+        }
         return false;
     }
 
