@@ -44,7 +44,10 @@
         "source": "https://github.com/pear/Archive_Tar"
     },
     "require-dev": {
-        "phpunit/phpunit": "*"
+        "phpunit/phpunit": "^10.5"
+    },
+    "scripts": {
+        "test": "phpunit -c phpunit.xml.dist --no-coverage"
     },
     "extra": {
         "branch-alias": {
