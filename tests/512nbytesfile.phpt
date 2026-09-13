@@ -3,11 +3,11 @@ test file size that happens to be 512 * n bytes
 --SKIPIF--
 --FILE--
 <?php
-$dirname = dirname(__FILE__);
+$dirname = __DIR__;
 require_once $dirname . '/setup.php.inc';
 
 $tar = new Archive_Tar($dirname . '/512nbytesfile.tar.gz', null, 2048);
-$tar->add($dirname .'/testblock3');
+$tar->addModify($dirname . '/testblock3', '', $dirname);
 $tar->listContent();
 $phpunit->assertNoErrors('after tar archive listing');
 
@@ -16,9 +16,9 @@ $phpunit->assertNoErrors('after shell tar listing');
 
 $expectedvalue = 
 <<< EOD
-$dirname/testblock3
-$dirname/testblock3/1024bytes.txt
-$dirname/testblock3/randombytes.txt
+testblock3
+testblock3/1024bytes.txt
+testblock3/randombytes.txt
 EOD;
 $phpunit->assertEquals($expectedvalue, $returnval, 'wrong output for shell tar verification');
 

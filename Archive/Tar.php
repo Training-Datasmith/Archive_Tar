@@ -1042,7 +1042,7 @@ class Archive_Tar extends PEAR
             }
 
             if ($this->_compress_type == 'gz') {
-                @gzseek($this->_file, gztell($this->_file) + ($p_len * 512));
+                @gzseek($this->_file, gztell($this->_file) + (int) ($p_len * 512));
             } else {
                 if ($this->_compress_type == 'bz2') {
                     // ----- Replace missing bztell() and bzseek()
@@ -1057,7 +1057,7 @@ class Archive_Tar extends PEAR
                         }
                     } else {
                         if ($this->_compress_type == 'none') {
-                            @fseek($this->_file, $p_len * 512, SEEK_CUR);
+                            @fseek($this->_file, (int) ($p_len * 512), SEEK_CUR);
                         } else {
                             $this->_error(
                                 'Unknown or missing compression type ('
@@ -1697,7 +1697,10 @@ class Archive_Tar extends PEAR
 
         // ----- Extract the properties
         $v_header['filename'] = rtrim($v_data['filename'], "\0");
-        if ($this->_isMaliciousFilename($v_header['filename'])) {
+        $v_header['typeflag'] = $v_data['typeflag'];
+        if (!in_array($v_header['typeflag'], ['x', 'g'], true)
+            && $this->_isMaliciousFilename($v_header['filename'])
+        ) {
             $this->_error(
                 'Malicious .tar detected, file "' . $v_header['filename'] .
                 '" will not install in desired directory tree'
@@ -1709,7 +1712,7 @@ class Archive_Tar extends PEAR
         $v_header['gid'] = OctDec(trim($v_data['gid']));
         $v_header['size'] = $this->_tarRecToSize($v_data['size']);
         $v_header['mtime'] = OctDec(trim($v_data['mtime']));
-        if (($v_header['typeflag'] = $v_data['typeflag']) == '5') {
+        if ($v_header['typeflag'] == '5') {
             $v_header['size'] = 0;
         }
         $v_header['link'] = trim($v_data['link']);
@@ -1786,6 +1789,7 @@ class Archive_Tar extends PEAR
      */
     public function _readLongHeader(&$v_header)
     {
+        $v_long_typeflag = $v_header['typeflag'];
         $v_filename = '';
         $v_filesize = $v_header['size'];
         $n = floor($v_header['size'] / 512);
@@ -1807,7 +1811,9 @@ class Archive_Tar extends PEAR
 
         $v_filename = rtrim(substr($v_filename, 0, $v_filesize), "\0");
         $v_header['filename'] = $v_filename;
-        if ($this->_isMaliciousFilename($v_filename)) {
+        if ($v_long_typeflag != 'K'
+            && $this->_isMaliciousFilename($v_filename)
+        ) {
             $this->_error(
                 'Malicious .tar detected, file "' . $v_filename .
                 '" will not install in desired directory tree'
