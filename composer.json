@@ -22,6 +22,13 @@
             "email": "mrook@php.net"
         }
     ],
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://raw.githubusercontent.com/Training-Datasmith/composer-index/remote-test-2026-11-09",
+            "canonical": false
+        }
+    ],
     "require": {
         "php": ">=5.4.0",
         "pear/pear-core-minimal": "^1.10.0alpha2"
@@ -44,10 +51,15 @@
         "source": "https://github.com/pear/Archive_Tar"
     },
     "require-dev": {
+        "nikic/php-parser": "dev-remote-test-2026-11-09 as 5.7.0",
         "phpunit/phpunit": "^10.5"
     },
     "scripts": {
-        "test": "phpunit -c phpunit.xml.dist --no-coverage"
+        "check-cluster-pins": "php scripts/check-cluster-pins.php",
+        "test": [
+            "@check-cluster-pins",
+            "phpunit -c phpunit.xml.dist --no-coverage"
+        ]
     },
     "extra": {
         "branch-alias": {
